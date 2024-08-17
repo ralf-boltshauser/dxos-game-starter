@@ -1,9 +1,24 @@
 import { S, TypedObject } from "@dxos/echo-schema";
 
-export class Task extends TypedObject({
-  typename: "example.Task",
+export enum GameStateEnum {
+  LOBBY = "LOBBY",
+  RACING = "RACING",
+  FINISHED = "FINISHED",
+}
+
+export class GameState extends TypedObject({
+  typename: "example.GameState",
   version: "0.1.0",
 })({
-  title: S.String,
-  completed: S.Boolean,
+  state: S.Enums(GameStateEnum),
+}) {}
+
+export class Racer extends TypedObject({
+  typename: "example.Racer",
+  version: "0.1.0",
+})({
+  playerId: S.String,
+  playerName: S.String,
+  number: S.Number,
+  totalWins: S.Number,
 }) {}

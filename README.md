@@ -3,16 +3,16 @@
 - [ ] pwa support for device functions like shaking
 - [ ] implement both modes
   - [ ] host is screen (laptop or tv)
-  - [ ] host is player
+  - [x] host is player
 - [ ] implement a default game that manages:
-  - [ ] spaces
-  - [ ] join
-  - [ ] sync
-  - [ ] scores
-  - [ ] lobby screen
+  - [x] spaces
+  - [x] join
+  - [x] sync
+  - [x] scores
+  - [x] lobby screen
   - [ ] some menu during the game if necessary
-  - [ ] game restart
-- [ ] right config to deploy on vercel
+  - [x] game restart
+- [x] right config to deploy on vercel
 - [ ] a good readme
 - [ ] shadcn support
   - [ ] add index.css to app.tsx

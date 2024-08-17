@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import {
   createBrowserRouter,
-  Navigate,
   RouterProvider,
   useNavigate,
   useParams,
@@ -17,51 +16,87 @@ import {
 } from "@dxos/react-client";
 import { create, Filter, useQuery, useSpace } from "@dxos/react-client/echo";
 
-import { TaskList } from "./TaskList";
-import { Task } from "./schema";
+import { useIdentity } from "@dxos/react-client/halo";
+import Finished from "./Finished";
+import { Game } from "./Game";
+import Home from "./Home";
+import Lobby from "./Lobby";
+import { GameState, GameStateEnum, Racer } from "./schema";
 
 const config = async () => new Config(Local(), Defaults());
 
-export const TaskListContainer = () => {
-  const { spaceKey } = useParams<{ spaceKey: string }>();
-
-  const space = useSpace(spaceKey);
-  const tasks = useQuery<Task>(space, Filter.schema(Task));
+export const GameContainer = () => {
+  const { spaceId } = useParams<{ spaceId: string }>();
+  const space = useSpace(spaceId);
+  const gameState = useQuery<GameState>(space, Filter.schema(GameState));
   const shell = useShell();
 
-  return (
-    <TaskList
-      tasks={tasks}
-      onInviteClick={async () => {
-        if (!space) {
-          return;
-        }
-        void shell.shareSpace({ spaceKey: space?.key });
-      }}
-      onTaskCreate={(newTaskTitle) => {
-        const task = create(Task, { title: newTaskTitle, completed: false });
-        space?.db.add(task);
-      }}
-      onTaskRemove={(task) => {
-        space?.db.remove(task);
-      }}
-      onTaskTitleChange={(task, newTitle) => {
-        task.title = newTitle;
-      }}
-      onTaskCheck={(task, checked) => {
-        task.completed = checked;
-      }}
-    />
-  );
-};
+  if (gameState.length == 0) {
+    return <Home />;
+  }
 
-export const Home = () => {
-  const space = useSpace();
+  switch (gameState[0].state) {
+    case GameStateEnum.LOBBY:
+      return (
+        <Lobby
+          space={space}
+          onInviteClick={async () => {
+            if (!space) {
+              return;
+            }
+            void shell.shareSpace({ spaceKey: space?.key });
+          }}
+        />
+      );
+    case GameStateEnum.FINISHED:
+      return <Finished space={space} />;
+    case GameStateEnum.RACING:
+      return <Game space={space} />;
+    default:
+      return <p>empty gamestate</p>;
+  }
+};
+// export const TaskListContainer = () => {
+//   const { spaceKey } = useParams<{ spaceKey: string }>();
+
+//   const space = useSpace(spaceKey);
+//   const tasks = useQuery<Task>(space, Filter.schema(Task));
+//   const shell = useShell();
+
+//   return (
+//     <TaskList
+//       tasks={tasks}
+//       onInviteClick={async () => {
+//         if (!space) {
+//           return;
+//         }
+//         void shell.shareSpace({ spaceKey: space?.key });
+//       }}
+//       onTaskCreate={(newTaskTitle) => {
+//         const task = create(Task, { title: newTaskTitle, completed: false });
+//         space?.db.add(task);
+//       }}
+//       onTaskRemove={(task) => {
+//         space?.db.remove(task);
+//       }}
+//       onTaskTitleChange={(task, newTitle) => {
+//         task.title = newTitle;
+//       }}
+//       onTaskCheck={(task, checked) => {
+//         task.completed = checked;
+//       }}
+//     />
+//   );
+// };
+
+export const HomeContainer = () => {
+  // const space = useSpace();
   const shell = useShell();
   const [search, setSearchParams] = useSearchParams();
   const invitationCode = search.get("spaceInvitationCode");
   const deviceInvitationCode = search.get("deviceInvitationCode");
   const navigate = useNavigate();
+  const identity = useIdentity();
 
   useEffect(() => {
     if (deviceInvitationCode) {
@@ -77,23 +112,31 @@ export const Home = () => {
       void (async () => {
         const { space } = await shell.joinSpace({ invitationCode });
         if (space) {
-          navigate(`/space/${space.key}`);
+          space.db.add(
+            create(Racer, {
+              playerId: identity.identityKey.toString(),
+              playerName: "Anonymous",
+              number: 0,
+              totalWins: 0,
+            })
+          );
+          navigate(`/space/${space.id}`);
         }
       })();
     }
   }, [invitationCode, deviceInvitationCode]);
 
-  return space ? <Navigate to={`/space/${space.key}`} /> : null;
+  return <Home />;
 };
 
 const router = createBrowserRouter([
   {
-    path: "/space/:spaceKey",
-    element: <TaskListContainer />,
+    path: "/space/:spaceId",
+    element: <GameContainer />,
   },
   {
     path: "/",
-    element: <Home />,
+    element: <HomeContainer />,
   },
 ]);
 
@@ -103,17 +146,21 @@ export const App = () => {
       config={config}
       shell="./shell.html"
       onInitialized={async (client) => {
-        client.addTypes([Task]);
+        client.addTypes([GameState, Racer]);
         const searchParams = new URLSearchParams(location.search);
         if (
           !client.halo.identity.get() &&
           !searchParams.has("deviceInvitationCode")
         ) {
-          await client.halo.createIdentity();
+          await client.halo.createIdentity({
+            displayName: "Anonymous",
+          });
         }
       }}
     >
-      <RouterProvider router={router} />
+      <div className="dark">
+        <RouterProvider router={router} />
+      </div>
     </ClientProvider>
   );
 };
