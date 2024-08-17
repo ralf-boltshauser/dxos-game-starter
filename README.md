@@ -1,0 +1,21 @@
+# dxos-game-starter
+## Todos
+- [ ] pwa support for device functions like shaking
+- [ ] implement both modes
+  - [ ] host is screen (laptop or tv)
+  - [ ] host is player
+- [ ] implement a default game that manages:
+  - [ ] spaces
+  - [ ] join
+  - [ ] sync
+  - [ ] scores
+  - [ ] lobby screen
+  - [ ] some menu during the game if necessary
+  - [ ] game restart
+- [ ] right config to deploy on vercel
+- [ ] a good readme
+- [ ] shadcn support
+  - [ ] add index.css to app.tsx
+- [x] setup for vite & vercel
+  - [x] dist default
+  - [x] vite config rollup -> shell.html

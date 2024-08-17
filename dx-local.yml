@@ -1,0 +1,4 @@
+version: 1
+runtime:
+  services:
+    signaling: [server: wss://kube.dxos.org/.well-known/dx/signal]
