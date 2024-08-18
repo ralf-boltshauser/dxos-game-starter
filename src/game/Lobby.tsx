@@ -2,8 +2,12 @@ import useActiveGameState from "@/lib/hooks/useActiveGameState";
 import useGameSpace from "@/lib/hooks/useGameSpace";
 import useIsCreator from "@/lib/hooks/useIsCreator";
 import useMyPlayer from "@/lib/hooks/useMyPlayer";
+import useHaloProfile, {
+  identityToProfile,
+  memberFromKeySpace,
+} from "@/lib/hooks/useProfile";
+import { useClient } from "@dxos/react-client";
 import { Filter, useQuery } from "@dxos/react-client/echo";
-import { useIdentity } from "@dxos/react-client/halo";
 import { TrashIcon } from "@radix-ui/react-icons";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -20,9 +24,10 @@ export default function Lobby({
   onInviteClick: () => any;
 }) {
   const { space } = useGameSpace();
+  const client = useClient();
   const activeGameState = useActiveGameState();
+  const profile = useHaloProfile();
   const players = useQuery(space, Filter.schema(Player));
-  const identity = useIdentity();
   const navigate = useNavigate();
 
   const [countdown, setCountdown] = useState<null | number>(null);
@@ -93,7 +98,18 @@ export default function Lobby({
 
   return (
     <div>
-      <h2>Lobby</h2>
+      <div className="flex flex-row justify-between items-center">
+        <h2 className="">Lobby</h2>
+        <div className="bg-customColor text-white">Hello, Tailwind!</div>
+        <Button
+          onClick={() => client.shell.open()}
+          size="icon"
+          variant="outline"
+          className={`bg-${profile.hue}-500`}
+        >
+          {profile.emoji}
+        </Button>
+      </div>
       {countdown != null ? (
         <div>{countdown > 0 ? countdown : "Go!"}</div>
       ) : (
@@ -114,6 +130,14 @@ export default function Lobby({
                           player.ready ? "text-green-500" : "text-red-600"
                         }`}
                       >
+                        <span>
+                          {
+                            identityToProfile(
+                              memberFromKeySpace(player.playerId, space)
+                                .identity
+                            ).emoji
+                          }
+                        </span>
                         <span>{player.playerName}</span>
                         <Button
                           size="icon"

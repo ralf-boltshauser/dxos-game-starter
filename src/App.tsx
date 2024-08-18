@@ -129,7 +129,9 @@ export const App = () => {
         }
       }}
     >
-      <RouterProvider router={router} />
+      <div className="m-5">
+        <RouterProvider router={router} />
+      </div>
     </ClientProvider>
   );
 };

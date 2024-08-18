@@ -2,10 +2,19 @@
 module.exports = {
   darkMode: ["class"],
   content: [
+    "./index.html",
+    "./public/index.html",
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
+  ],
+  safelist: [
+    "bg-emerald-500",
+    {
+      pattern: /^bg-/,
+      pattern: /^text-/,
+    },
   ],
   prefix: "",
   theme: {
@@ -18,6 +27,7 @@ module.exports = {
     },
     extend: {
       colors: {
+        customColor: "#1c1c1e",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -73,6 +83,5 @@ module.exports = {
       },
     },
   },
-  safelist: [{ pattern: /text-./ }],
   plugins: [require("tailwindcss-animate")],
 };

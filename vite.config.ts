@@ -24,7 +24,6 @@ export default defineConfig({
     format: "es",
     plugins: () => [topLevelAwait(), wasm()],
   },
-
   plugins: [
     ConfigPlugin(),
     topLevelAwait(),
