@@ -1,46 +1,41 @@
-import { Filter, Space } from "@dxos/client/echo";
+import useActiveGameState from "@/lib/hooks/useActiveGameState";
+import useGameSpace from "@/lib/hooks/useGameSpace";
+import useMyPlayer from "@/lib/hooks/useMyPlayer";
+import { Filter } from "@dxos/client/echo";
 import { useQuery } from "@dxos/react-client/echo";
-import { useIdentity } from "@dxos/react-client/halo";
 import React from "react";
 import { Button } from "../components/ui/button";
-import { GameState, GameStateEnum, Racer } from "../schema";
+import { Player } from "../schema";
+import { GameLogic } from "./GameLogic";
 
-// export type TaskListProps = {
-//   tasks?: Task[];
-//   onInviteClick?: () => any;
-//   onTaskCreate?: (text: string) => any;
-//   onTaskRemove?: (task: Task) => any;
-//   onTaskTitleChange?: (task: Task, newTitle: string) => any;
-//   onTaskCheck?: (task: Task, checked: boolean) => any;
-// };
+export const Game = () => {
+  const { space } = useGameSpace();
+  const players = useQuery(space, Filter.schema(Player));
+  const myPlayer = useMyPlayer();
 
-export const Game = ({ space }: { space: Space }) => {
-  const identity = useIdentity();
-  const racers = useQuery(space, Filter.schema(Racer));
-  const myRacer = racers.find(
-    (r) => r.playerId == identity.identityKey.toString()
-  );
+  const activeGameState = useActiveGameState();
 
-  const gameStates = useQuery(space, Filter.schema(GameState));
+  const gameLogic = new GameLogic(space);
 
-  if (myRacer?.number >= 10 && gameStates?.length > 0) {
-    gameStates[0].state = GameStateEnum.FINISHED;
+  if (activeGameState) {
+    gameLogic.checkWin({ player: myPlayer, gameState: activeGameState });
   }
 
   return (
     <div>
       <h2>Race! </h2>
 
-      {racers.map((r) => {
-        return (
-          <div key={r.playerId}>
-            {r.playerName}: {r.number}
-          </div>
-        );
-      })}
+      {!activeGameState?.hasHost &&
+        players.map((p) => {
+          return (
+            <div key={p.playerId}>
+              {p.playerName}: {p.number}
+            </div>
+          );
+        })}
       <Button
         onClick={() => {
-          myRacer.number += 1;
+          myPlayer.number += 1;
         }}
       >
         +1

@@ -1,9 +1,10 @@
 # dxos-game-starter
 ## Todos
-- [ ] pwa support for device functions like shaking
+- [ ] try to build a game and see what i need to adjust
 - [ ] implement both modes
-  - [ ] host is screen (laptop or tv)
+  - [x] host is screen (laptop or tv)
   - [x] host is player
+- [ ] pwa support for device functions like shaking
 - [ ] implement a default game that manages:
   - [x] spaces
   - [x] join
@@ -11,8 +12,12 @@
   - [x] scores
   - [x] lobby screen
   - [ ] some menu during the game if necessary
+    - [ ] leaving a space
+    - [ ] deleting a space
+    - [ ] stuff like that
   - [x] game restart
 - [x] right config to deploy on vercel
+- [ ] code like gameState[0] will lead to bugs
 - [ ] a good readme
 - [ ] shadcn support
   - [ ] add index.css to app.tsx
