@@ -39,6 +39,7 @@ export const GameContainer = ({ isHost }: { isHost: boolean }) => {
 
   switch (gameState[0].state) {
     case GameStateEnum.LOBBY:
+    case GameStateEnum.COUNTDOWN:
       return (
         <Lobby
           isHost={isHost}

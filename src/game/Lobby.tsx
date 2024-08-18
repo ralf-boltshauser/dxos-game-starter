@@ -29,6 +29,10 @@ export default function Lobby({
   const [isCounting, setIsCounting] = useState(false);
 
   const isCreator = useIsCreator();
+  let hasHost = false;
+  if (activeGameState) {
+    hasHost = activeGameState.hasHost;
+  }
 
   const myPlayer = useMyPlayer();
 
@@ -67,6 +71,9 @@ export default function Lobby({
   }, [isCreator, players, activeGameState, isCounting]);
 
   const startCountdown = () => {
+    if (activeGameState) {
+      activeGameState.state = GameStateEnum.COUNTDOWN;
+    }
     setCountdown(3); // Reset the count to start from 3
     setIsCounting(true);
   };
@@ -80,6 +87,10 @@ export default function Lobby({
     );
   }
 
+  if (!activeGameState) {
+    return <p>loading ...</p>;
+  }
+
   return (
     <div>
       <h2>Lobby</h2>
@@ -87,50 +98,56 @@ export default function Lobby({
         <div>{countdown > 0 ? countdown : "Go!"}</div>
       ) : (
         <>
-          {!isHost && <NameComponent space={space} />}
-          {isHost && (
+          {activeGameState.state === GameStateEnum.COUNTDOWN ? (
+            <div>Get Ready!</div>
+          ) : (
             <>
-              <h2>Members</h2>
-              <ul>
-                {players.map((player) => (
-                  <li
-                    key={player.playerId}
-                    className={`flex flex-row gap-2 justify-start items-center ${
-                      player.ready ? "text-green-500" : "text-red-600"
-                    }`}
+              {!isHost && <NameComponent space={space} />}
+              {(!hasHost || isHost) && (
+                <>
+                  <h2>Members</h2>
+                  <ul>
+                    {players.map((player) => (
+                      <li
+                        key={player.playerId}
+                        className={`flex flex-row gap-2 justify-start items-center ${
+                          player.ready ? "text-green-500" : "text-red-600"
+                        }`}
+                      >
+                        <span>{player.playerName}</span>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => gameLogic.removePlayer(player)}
+                        >
+                          <TrashIcon />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>{" "}
+                  <Button onClick={onInviteClick}>Invite</Button>{" "}
+                </>
+              )}
+              {!isHost &&
+                (myPlayer?.ready ? (
+                  <Button
+                    onClick={() => {
+                      myPlayer.ready = false;
+                    }}
                   >
-                    <span>{player.playerName}</span>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => gameLogic.removePlayer(player)}
-                    >
-                      <TrashIcon />
-                    </Button>
-                  </li>
+                    Not Ready!
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      myPlayer.ready = true;
+                    }}
+                  >
+                    Ready!
+                  </Button>
                 ))}
-              </ul>{" "}
-              <Button onClick={onInviteClick}>Invite</Button>{" "}
             </>
           )}
-          {!isCreator &&
-            (myPlayer?.ready ? (
-              <Button
-                onClick={() => {
-                  myPlayer.ready = false;
-                }}
-              >
-                Not Ready!
-              </Button>
-            ) : (
-              <Button
-                onClick={() => {
-                  myPlayer.ready = true;
-                }}
-              >
-                Ready!
-              </Button>
-            ))}
         </>
       )}
     </div>
