@@ -17,15 +17,16 @@ import {
 import { create, Filter, useQuery, useSpace } from "@dxos/react-client/echo";
 
 import { useIdentity } from "@dxos/react-client/halo";
-import Finished from "./Finished";
-import { Game } from "./Game";
-import Home from "./Home";
-import Lobby from "./Lobby";
+import Finished from "./game/Finished";
+import { Game } from "./game/Game";
+import Home from "./game/Home";
+import { Host } from "./game/Host";
+import Lobby from "./game/Lobby";
 import { GameState, GameStateEnum, Racer } from "./schema";
 
 const config = async () => new Config(Local(), Defaults());
 
-export const GameContainer = () => {
+export const GameContainer = ({ isHost }: { isHost: boolean }) => {
   const { spaceId } = useParams<{ spaceId: string }>();
   const space = useSpace(spaceId);
   const gameState = useQuery<GameState>(space, Filter.schema(GameState));
@@ -39,6 +40,7 @@ export const GameContainer = () => {
     case GameStateEnum.LOBBY:
       return (
         <Lobby
+          isHost={isHost}
           space={space}
           onInviteClick={async () => {
             if (!space) {
@@ -51,7 +53,7 @@ export const GameContainer = () => {
     case GameStateEnum.FINISHED:
       return <Finished space={space} />;
     case GameStateEnum.RACING:
-      return <Game space={space} />;
+      return isHost ? <Host space={space} /> : <Game space={space} />;
     default:
       return <p>empty gamestate</p>;
   }
@@ -132,7 +134,11 @@ export const HomeContainer = () => {
 const router = createBrowserRouter([
   {
     path: "/space/:spaceId",
-    element: <GameContainer />,
+    element: <GameContainer isHost={false} />,
+  },
+  {
+    path: "/host/:spaceId",
+    element: <GameContainer isHost={true} />,
   },
   {
     path: "/",

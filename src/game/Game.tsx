@@ -2,8 +2,8 @@ import { Filter, Space } from "@dxos/client/echo";
 import { useQuery } from "@dxos/react-client/echo";
 import { useIdentity } from "@dxos/react-client/halo";
 import React from "react";
-import { Button } from "./components/ui/button";
-import { GameState, GameStateEnum, Racer } from "./schema";
+import { Button } from "../components/ui/button";
+import { GameState, GameStateEnum, Racer } from "../schema";
 
 // export type TaskListProps = {
 //   tasks?: Task[];
@@ -30,6 +30,7 @@ export const Game = ({ space }: { space: Space }) => {
   return (
     <div>
       <h2>Race! </h2>
+
       {racers.map((r) => {
         return (
           <div key={r.playerId}>

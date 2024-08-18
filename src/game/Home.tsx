@@ -3,9 +3,9 @@ import { create, useSpace } from "@dxos/react-client/echo";
 import { useIdentity } from "@dxos/react-client/halo";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import NameComponent from "./components/NameComponent";
-import { Button } from "./components/ui/button";
-import { GameState, GameStateEnum, Racer } from "./schema";
+import NameComponent from "../components/NameComponent";
+import { Button } from "../components/ui/button";
+import { GameState, GameStateEnum, Racer } from "../schema";
 export default function Lobby() {
   const space = useSpace();
   const navigate = useNavigate();
@@ -36,7 +36,21 @@ export default function Lobby() {
               navigate(`/space/${space.id}`);
             }}
           >
-            Start Game
+            Start as Player
+          </Button>
+          <Button
+            onClick={async () => {
+              const gameState = create(GameState, {
+                state: GameStateEnum.LOBBY,
+              });
+              space?.db.add(gameState);
+              await client.halo.updateProfile({
+                displayName: "Host",
+              });
+              navigate(`/host/${space.id}`);
+            }}
+          >
+            Start as Host
           </Button>
         </div>
       )}

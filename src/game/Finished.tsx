@@ -1,8 +1,8 @@
+import { Button } from "@/components/ui/button";
+import { GameState, GameStateEnum, Racer } from "@/schema";
 import { Filter, Space } from "@dxos/client/echo";
 import { useQuery } from "@dxos/react-client/echo";
 import React from "react";
-import { Button } from "./components/ui/button";
-import { GameState, GameStateEnum, Racer } from "./schema";
 
 export default function Finished({ space }: { space: Space }) {
   const racers = useQuery(space, Filter.schema(Racer));

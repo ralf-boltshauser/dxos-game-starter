@@ -1,13 +1,15 @@
 import { Filter, Space, useQuery } from "@dxos/react-client/echo";
 import React from "react";
-import NameComponent from "./components/NameComponent";
-import { Button } from "./components/ui/button";
-import { GameState, GameStateEnum, Racer } from "./schema";
+import NameComponent from "../components/NameComponent";
+import { Button } from "../components/ui/button";
+import { GameState, GameStateEnum, Racer } from "../schema";
 export default function Lobby({
   space,
+  isHost,
   onInviteClick,
 }: {
   space: Space;
+  isHost: boolean;
   onInviteClick: () => any;
 }) {
   const gameState = useQuery(space, Filter.schema(GameState));
@@ -16,7 +18,7 @@ export default function Lobby({
   return (
     <div>
       <h2>Lobby</h2>
-      <NameComponent space={space} />
+      {!isHost && <NameComponent space={space} />}
       <Button onClick={onInviteClick}>Invite</Button>
       <h2>Members</h2>
       <ul>
