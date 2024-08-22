@@ -3,7 +3,7 @@ import { S, TypedObject } from "@dxos/echo-schema";
 export enum GameStateEnum {
   LOBBY = "LOBBY",
   COUNTDOWN = "COUNTDOWN",
-  INPROGRESS = "RACING",
+  INPROGRESS = "INPROGRESS",
   FINISHED = "FINISHED",
 }
 

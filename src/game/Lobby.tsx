@@ -72,17 +72,17 @@ export default function Lobby({
       !isCounting &&
       players?.length >= gameLogic.minPlayers
     ) {
+      // Uncomment to add countdown
       // startCountdown();
       if (activeGameState) {
+        activeGameState.state = GameStateEnum.INPROGRESS;
+        console.log(activeGameState.state);
         players.forEach((player) => {
           player.ready = false;
         });
-        activeGameState.state = GameStateEnum.INPROGRESS;
       }
     }
   }, [isCreator, players, activeGameState, isCounting]);
-
-  console.log(isCreator, myPlayer?.ready);
 
   const startCountdown = () => {
     if (activeGameState) {
