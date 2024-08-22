@@ -5,6 +5,7 @@ import { useClient } from "@dxos/react-client";
 import { useQuery } from "@dxos/react-client/echo";
 import { useIdentity } from "@dxos/react-client/halo";
 import React from "react";
+import { Input } from "./ui/input";
 
 export default function NameComponent({ space }: { space: Space }) {
   const client = useClient();
@@ -19,7 +20,7 @@ export default function NameComponent({ space }: { space: Space }) {
 
   React.useEffect(() => {
     const debounceTimeout = setTimeout(() => {
-      client.halo.updateProfile({ displayName: name });
+      client.halo.updateProfile({ ...identity.profile, displayName: name });
       if (myPlayer) {
         myPlayer.playerName = name;
       }
@@ -31,7 +32,11 @@ export default function NameComponent({ space }: { space: Space }) {
   }, [name, client.halo]);
   return (
     <div>
-      <input value={name} onChange={(e) => setName(e.target.value)} />
+      <Input
+        className="max-w-[200px]"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
     </div>
   );
 }

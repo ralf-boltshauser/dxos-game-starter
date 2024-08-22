@@ -2,12 +2,10 @@ import useActiveGameState from "@/lib/hooks/useActiveGameState";
 import useGameSpace from "@/lib/hooks/useGameSpace";
 import useIsCreator from "@/lib/hooks/useIsCreator";
 import useMyPlayer from "@/lib/hooks/useMyPlayer";
-import useHaloProfile, {
-  identityToProfile,
-  memberFromKeySpace,
-} from "@/lib/hooks/useProfile";
-import { useClient } from "@dxos/react-client";
-import { Filter, useQuery } from "@dxos/react-client/echo";
+import useHaloProfile, { identityToProfile } from "@/lib/hooks/useProfile";
+import { useClient, useShell } from "@dxos/react-client";
+import { Filter, useMembers, useQuery } from "@dxos/react-client/echo";
+import { useIdentity } from "@dxos/react-client/halo";
 import { TrashIcon } from "@radix-ui/react-icons";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -25,6 +23,9 @@ export default function Lobby({
 }) {
   const { space } = useGameSpace();
   const client = useClient();
+  const members = useMembers(space.key);
+  const shell = useShell();
+  const identity = useIdentity();
   const activeGameState = useActiveGameState();
   const profile = useHaloProfile();
   const players = useQuery(space, Filter.schema(Player));
@@ -71,9 +72,17 @@ export default function Lobby({
       !isCounting &&
       players?.length >= gameLogic.minPlayers
     ) {
-      startCountdown();
+      // startCountdown();
+      if (activeGameState) {
+        players.forEach((player) => {
+          player.ready = false;
+        });
+        activeGameState.state = GameStateEnum.INPROGRESS;
+      }
     }
   }, [isCreator, players, activeGameState, isCounting]);
+
+  console.log(isCreator, myPlayer?.ready);
 
   const startCountdown = () => {
     if (activeGameState) {
@@ -83,11 +92,24 @@ export default function Lobby({
     setIsCounting(true);
   };
 
+  if (!space || !members || !identity) {
+    return <p>loading ...</p>;
+  }
+
   if (!myPlayer && !isHost) {
     return (
       <div>
         <p>It seems you are no longer part of this game!</p>
-        <Button onClick={() => navigate("/")}>Home</Button>
+        <Button
+          onClick={() =>
+            gameLogic.joinPlayer({
+              playerName: profile.displayName,
+              playerId: identity.identityKey.toString(),
+            })
+          }
+        >
+          Rejoin
+        </Button>
       </div>
     );
   }
@@ -97,15 +119,15 @@ export default function Lobby({
   }
 
   return (
-    <div>
+    <div className="">
       <div className="flex flex-row justify-between items-center">
-        <h2 className="">Lobby</h2>
+        <h2 className="">Lobby: {space.id.substring(0, 10)}...</h2>
         <div className="bg-customColor text-white">Hello, Tailwind!</div>
         <Button
           onClick={() => client.shell.open()}
           size="icon"
           variant="outline"
-          className={`bg-${profile.hue}-500`}
+          className={`bg-${profile.hue}-200`}
         >
           {profile.emoji}
         </Button>
@@ -122,58 +144,79 @@ export default function Lobby({
               {(!hasHost || isHost) && (
                 <>
                   <h2>Members</h2>
-                  <ul>
-                    {players.map((player) => (
-                      <li
-                        key={player.playerId}
-                        className={`flex flex-row gap-2 justify-start items-center ${
-                          player.ready ? "text-green-500" : "text-red-600"
-                        }`}
-                      >
-                        <span>
-                          {
-                            identityToProfile(
-                              memberFromKeySpace(player.playerId, space)
-                                .identity
-                            ).emoji
-                          }
-                        </span>
-                        <span>{player.playerName}</span>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => gameLogic.removePlayer(player)}
+                  <div className="my-3">
+                    {players.map((player) => {
+                      const playerProfile = identityToProfile(
+                        members.find(
+                          (m) =>
+                            m.identity.identityKey.toString() ===
+                            player.playerId
+                        ).identity
+                      );
+                      return (
+                        <li
+                          key={player.playerId}
+                          className={`flex flex-row gap-2 justify-start items-center ${
+                            player.ready
+                              ? `text-${playerProfile.hue}-800`
+                              : "animate-pulse"
+                          }`}
                         >
-                          <TrashIcon />
-                        </Button>
-                      </li>
-                    ))}
-                  </ul>{" "}
+                          <span
+                            className={`bg-${playerProfile.hue}-200 w-8 h-8 flex  justify-center items-center rounded`}
+                          >
+                            {playerProfile.emoji}
+                          </span>
+                          <span>{player.playerName}</span>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => gameLogic.removePlayer(player)}
+                          >
+                            <TrashIcon />
+                          </Button>
+                        </li>
+                      );
+                    })}
+                  </div>{" "}
                   <Button onClick={onInviteClick}>Invite</Button>{" "}
                 </>
               )}
-              {!isHost &&
-                (myPlayer?.ready ? (
-                  <Button
-                    onClick={() => {
-                      myPlayer.ready = false;
-                    }}
-                  >
-                    Not Ready!
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => {
-                      myPlayer.ready = true;
-                    }}
-                  >
-                    Ready!
-                  </Button>
-                ))}
+              {!isHost && (
+                <>
+                  {myPlayer?.ready ? (
+                    <Button
+                      onClick={() => {
+                        myPlayer.ready = false;
+                      }}
+                    >
+                      Not Ready!
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => {
+                        myPlayer.ready = true;
+                      }}
+                    >
+                      Ready!
+                    </Button>
+                  )}
+                </>
+              )}
             </>
           )}
         </>
       )}
+      <br />
+      <Button
+        className="mt-5"
+        variant="outline"
+        onClick={() => {
+          navigate("/");
+        }}
+      >
+        Back home
+      </Button>
     </div>
   );
 }

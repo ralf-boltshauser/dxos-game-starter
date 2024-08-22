@@ -17,6 +17,7 @@ import {
 import { Filter, useQuery, useSpace } from "@dxos/react-client/echo";
 
 import { useIdentity } from "@dxos/react-client/halo";
+import { Toaster } from "./components/ui/sonner";
 import { Game } from "./game/Game";
 import { GameLogic } from "./game/GameLogic";
 import Home from "./game/Home";
@@ -132,6 +133,9 @@ export const App = () => {
       <div className="m-5">
         <RouterProvider router={router} />
       </div>
+      <Toaster />
     </ClientProvider>
   );
 };
+
+export default App;

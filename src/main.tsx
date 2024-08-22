@@ -1,10 +1,15 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { createRoot } from "react-dom/client";
 
 // This includes css styles from @dxos/react-ui-theme.
 // This must precede all other style imports in the app.
-import "@dxosTheme";
+import "./index.css";
+import Loading from "./Loading";
 
-import { App } from "./App";
+const App = React.lazy(() => import("./App"));
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+  <Suspense fallback={<Loading />}>
+    <App />
+  </Suspense>
+);

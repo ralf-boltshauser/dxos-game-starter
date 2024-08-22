@@ -1,8 +1,8 @@
 import { ConfigPlugin } from "@dxos/config/vite-plugin";
-import { ThemePlugin } from "@dxos/react-ui-theme/plugin";
 import react from "@vitejs/plugin-react";
 import path, { resolve } from "path";
 import { defineConfig } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 import topLevelAwait from "vite-plugin-top-level-await";
 import wasm from "vite-plugin-wasm";
 
@@ -28,15 +28,36 @@ export default defineConfig({
     ConfigPlugin(),
     topLevelAwait(),
     wasm(),
-    react({ jsxRuntime: "classic" }),
-    ThemePlugin({
-      content: [
-        resolve(__dirname, "./index.html"),
-        resolve(__dirname, "./src/**/*.{js,ts,jsx,tsx}"),
-        resolve(__dirname, "node_modules/@dxos/react-ui/dist/**/*.mjs"),
-        resolve(__dirname, "node_modules/@dxos/react-ui-theme/dist/**/*.mjs"),
-      ],
+    VitePWA({
+      registerType: "autoUpdate",
+      manifest: {
+        theme_color: "#000000",
+        icons: [
+          {
+            src: "/icon-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+        ],
+      },
+      devOptions: {
+        enabled: true,
+      },
+      workbox: {
+        // allow links to open in my pwa matchin "dxos-qwixx.ralf-boltshauser.com"
+        navigateFallback: "/index.html",
+        navigateFallbackAllowlist: [/^\/[^\_]+\/?/],
+      },
     }),
+    react({ jsxRuntime: "classic" }),
+    // ThemePlugin({
+    //   content: [
+    //     resolve(__dirname, "./index.html"),
+    //     resolve(__dirname, "./src/**/*.{js,ts,jsx,tsx}"),
+    //     resolve(__dirname, "node_modules/@dxos/react-ui/dist/**/*.mjs"),
+    //     resolve(__dirname, "node_modules/@dxos/react-ui-theme/dist/**/*.mjs"),
+    //   ],
+    // }),
   ],
   resolve: {
     alias: {

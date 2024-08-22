@@ -16,10 +16,18 @@
     - [ ] deleting a space
     - [ ] stuff like that
   - [x] game restart
+- [x] join existing game from home screen
+- [x] pwa 
+- [x] tailwind config with vite
+- [x] join with code on home screen
 - [x] right config to deploy on vercel
-- [ ] code like gameState[0] will lead to bugs
+- [x] shadcn support
+- [ ] loading states
+- [ ] create a design for the whole app in figma
+- [ ] make game state have id of space, if already exist, fail or smth
+- [ ] if skip countdown make it easier with a function regarding setting ready to false etc. in lobby
+- [ ] code like gameState[0] will lead to bugs -> can be fixed with usequery, type, spaceId: ...
 - [ ] a good readme
-- [ ] shadcn support
   - [ ] add index.css to app.tsx
 - [x] setup for vite & vercel
   - [x] dist default

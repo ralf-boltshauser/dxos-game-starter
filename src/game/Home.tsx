@@ -1,4 +1,4 @@
-import { useClient } from "@dxos/react-client";
+import { useClient, useShell } from "@dxos/react-client";
 import { useSpace } from "@dxos/react-client/echo";
 import { useIdentity } from "@dxos/react-client/halo";
 import React from "react";
@@ -11,12 +11,49 @@ export default function Lobby() {
   const navigate = useNavigate();
   const identity = useIdentity();
   const client = useClient();
+  const shell = useShell();
 
   return (
     <div>
       <h2>Home</h2>
+      <h2>Rooms you have access to:</h2>
+      <div className="flex flex-col gap-2">
+        {client.spaces.get().map((space) => (
+          <div key={space.id} className="flex flex-row gap-4 items-center">
+            <h3>{space.id.substring(0, 5)}...</h3>
+            <Button
+              onClick={() => {
+                // gameLogic.startGame({
+                //   hasHost: false,
+                //   creatorId: identity.identityKey.toString(),
+                // });
+                // gameLogic.joinPlayer({
+                //   playerId: identity.identityKey.toString(),
+                //   playerName: identity.profile?.displayName || "Player",
+                // });
+
+                navigate(`/game/${space.id}`);
+              }}
+            >
+              Join
+            </Button>
+            <Button
+              onClick={async () => {
+                gameLogic.startGame({
+                  hasHost: true,
+                  creatorId: identity.identityKey.toString(),
+                });
+                navigate(`/host/${space.id}`);
+              }}
+            >
+              Start as Host
+            </Button>
+          </div>
+        ))}
+      </div>
+      <h2>Or</h2>
       {space && (
-        <div>
+        <div className="flex flex-row gap-4 items-center">
           <Button
             onClick={() => {
               gameLogic.startGame({
@@ -31,9 +68,9 @@ export default function Lobby() {
               navigate(`/game/${space.id}`);
             }}
           >
-            Start as Player
+            Start your own game!
           </Button>
-          <Button
+          {/* <Button
             onClick={async () => {
               gameLogic.startGame({
                 hasHost: true,
@@ -43,6 +80,23 @@ export default function Lobby() {
             }}
           >
             Start as Host
+          </Button> */}
+          <Button
+            variant="outline"
+            onClick={async () => {
+              const { space } = await shell.joinSpace({});
+
+              const gameLogic = new GameLogic(space);
+
+              await gameLogic.joinPlayer({
+                playerId: identity.identityKey.toString(),
+                playerName: identity.profile?.displayName || "Player",
+              });
+
+              navigate(`/game/${space.id}`);
+            }}
+          >
+            Join with code / link
           </Button>
         </div>
       )}
