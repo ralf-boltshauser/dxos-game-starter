@@ -22,13 +22,12 @@
 - [x] join with code on home screen
 - [x] right config to deploy on vercel
 - [x] shadcn support
-- [ ] loading states
+- [x] make game state have id of space, if already exist, fail or smth
+- [x] code like gameState[0] will lead to bugs -> can be fixed with usequery, type, spaceId: ...
 - [ ] create a design for the whole app in figma
-- [ ] make game state have id of space, if already exist, fail or smth
-- [ ] if skip countdown make it easier with a function regarding setting ready to false etc. in lobby
-- [ ] code like gameState[0] will lead to bugs -> can be fixed with usequery, type, spaceId: ...
 - [ ] a good readme
   - [ ] add index.css to app.tsx
+- [ ] loading states
 - [x] setup for vite & vercel
   - [x] dist default
   - [x] vite config rollup -> shell.html

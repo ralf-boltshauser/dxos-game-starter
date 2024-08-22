@@ -7,6 +7,7 @@ import { useClient, useShell } from "@dxos/react-client";
 import { Filter, useMembers, useQuery } from "@dxos/react-client/echo";
 import { useIdentity } from "@dxos/react-client/halo";
 import { TrashIcon } from "@radix-ui/react-icons";
+import { RefreshCwOff } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import NameComponent from "../components/NameComponent";
@@ -24,6 +25,7 @@ export default function Lobby({
   const { space } = useGameSpace();
   const client = useClient();
   const members = useMembers(space.key);
+
   const shell = useShell();
   const identity = useIdentity();
   const activeGameState = useActiveGameState();
@@ -83,6 +85,8 @@ export default function Lobby({
       }
     }
   }, [isCreator, players, activeGameState, isCounting]);
+
+  console.log(activeGameState?.spaceId);
 
   const startCountdown = () => {
     if (activeGameState) {
@@ -146,13 +150,11 @@ export default function Lobby({
                   <h2>Members</h2>
                   <div className="my-3">
                     {players.map((player) => {
-                      const playerProfile = identityToProfile(
-                        members.find(
-                          (m) =>
-                            m.identity.identityKey.toString() ===
-                            player.playerId
-                        ).identity
+                      const member = members.find(
+                        (m) =>
+                          m.identity.identityKey.toString() === player.playerId
                       );
+                      const playerProfile = identityToProfile(member.identity);
                       return (
                         <li
                           key={player.playerId}
@@ -163,9 +165,18 @@ export default function Lobby({
                           }`}
                         >
                           <span
-                            className={`bg-${playerProfile.hue}-200 w-8 h-8 flex  justify-center items-center rounded`}
+                            className={
+                              (member.presence
+                                ? `bg-${playerProfile.hue}-200`
+                                : `border-${playerProfile.hue}-200 border-2`) +
+                              ` w-8 h-8 flex justify-center items-center rounded `
+                            }
                           >
-                            {playerProfile.emoji}
+                            {member.presence ? (
+                              playerProfile.emoji
+                            ) : (
+                              <RefreshCwOff />
+                            )}
                           </span>
                           <span>{player.playerName}</span>
                           <Button

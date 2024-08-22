@@ -1,11 +1,13 @@
 import { GameState } from "@/schema";
-import { Filter } from "@dxos/client/echo";
 import { useQuery } from "@dxos/react-client/echo";
 import useGameSpace from "./useGameSpace";
 
 const useActiveGameState = (): GameState | null => {
   const { space } = useGameSpace();
-  const gameStates = useQuery(space, Filter.schema(GameState));
+  const gameStates = useQuery(space, {
+    type: GameState.Type,
+    spaceId: space.id,
+  });
 
   if (gameStates.length === 1) {
     return gameStates[0];

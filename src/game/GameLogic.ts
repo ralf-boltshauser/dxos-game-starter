@@ -16,12 +16,25 @@ export class GameLogic {
     hasHost: boolean;
     creatorId: string;
   }) {
+    // check if game state already exists by spaceId
+    const gameStates = await this.space.db
+      .query({
+        type: GameState.Type,
+        spaceId: this.space.id,
+      })
+      .run();
+
+    if (gameStates.results.length > 0) {
+      return;
+    }
     const gameState = create(GameState, {
+      spaceId: this.space.id,
       state: GameStateEnum.LOBBY,
       hasHost,
       creatorId,
       createdAt: Date.now(),
     });
+
     this.space.db.add(gameState);
   }
 
@@ -38,6 +51,18 @@ export class GameLogic {
     playerName: string;
     playerId: string;
   }) {
+    // check if player already exists by playerId
+    const players = await this.space.db
+      .query({
+        type: Player.Type,
+        playerId,
+      })
+      .run();
+
+    if (players.results.length > 0) {
+      return;
+    }
+
     this.space.db.add(
       create(Player, {
         playerName,

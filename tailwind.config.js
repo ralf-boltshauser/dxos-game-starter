@@ -85,6 +85,9 @@ module.exports = {
     {
       pattern: /^stroke-.*/,
     },
+    {
+      pattern: /^border-.*/,
+    },
   ],
   plugins: [require("tailwindcss-animate")],
 };

@@ -14,7 +14,7 @@ import {
   Local,
   useShell,
 } from "@dxos/react-client";
-import { Filter, useQuery, useSpace } from "@dxos/react-client/echo";
+import { useSpace } from "@dxos/react-client/echo";
 
 import { useIdentity } from "@dxos/react-client/halo";
 import { Toaster } from "./components/ui/sonner";
@@ -24,6 +24,7 @@ import Home from "./game/Home";
 import { Host } from "./game/Host";
 import Lobby from "./game/Lobby";
 import Ranking from "./game/Ranking";
+import useActiveGameState from "./lib/hooks/useActiveGameState";
 import { GameState, GameStateEnum, Player } from "./schema";
 
 const config = async () => new Config(Local(), Defaults());
@@ -31,14 +32,14 @@ const config = async () => new Config(Local(), Defaults());
 export const GameContainer = ({ isHost }: { isHost: boolean }) => {
   const { spaceId } = useParams<{ spaceId: string }>();
   const space = useSpace(spaceId);
-  const gameState = useQuery<GameState>(space, Filter.schema(GameState));
+  const activeGameState = useActiveGameState();
   const shell = useShell();
 
-  if (gameState.length == 0) {
-    return <Home />;
+  if (!activeGameState) {
+    return <p>Loading ...</p>;
   }
 
-  switch (gameState[0].state) {
+  switch (activeGameState.state) {
     case GameStateEnum.LOBBY:
     case GameStateEnum.COUNTDOWN:
       return (

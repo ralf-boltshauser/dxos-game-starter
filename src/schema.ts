@@ -11,6 +11,7 @@ export class GameState extends TypedObject({
   typename: "example.GameState",
   version: "0.1.0",
 })({
+  spaceId: S.String,
   state: S.Enums(GameStateEnum),
   hasHost: S.Boolean,
   creatorId: S.String,
