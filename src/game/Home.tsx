@@ -7,7 +7,7 @@ import { Button } from "../components/ui/button";
 import { GameLogic } from "./GameLogic";
 export default function Lobby() {
   const space = useSpace();
-  const gameLogic = new GameLogic(space);
+  const gameLogic = new GameLogic();
   const navigate = useNavigate();
   const identity = useIdentity();
   const client = useClient();
@@ -86,7 +86,7 @@ export default function Lobby() {
             onClick={async () => {
               const { space } = await shell.joinSpace({});
 
-              const gameLogic = new GameLogic(space);
+              const gameLogic = new GameLogic();
 
               await gameLogic.joinPlayer({
                 playerId: identity.identityKey.toString(),

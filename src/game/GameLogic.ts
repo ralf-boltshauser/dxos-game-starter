@@ -1,14 +1,21 @@
+import useActiveGameState from "@/lib/hooks/useActiveGameState";
+import useGameSpace from "@/lib/hooks/useGameSpace";
 import { GameState, GameStateEnum, Player } from "@/schema";
 import { create, Space } from "@dxos/client/echo";
 
 export class GameLogic {
   space: Space;
+  activeGameState: GameState;
   minPlayers = 1;
+  playerDefault = {
+    number: 0,
+  };
 
-  constructor(space: Space) {
+  constructor() {
+    const { space } = useGameSpace();
     this.space = space;
+    this.activeGameState = useActiveGameState();
   }
-
   async startGame({
     hasHost,
     creatorId,
@@ -27,6 +34,7 @@ export class GameLogic {
     if (gameStates.results.length > 0) {
       return;
     }
+
     const gameState = create(GameState, {
       spaceId: this.space.id,
       state: GameStateEnum.LOBBY,
@@ -38,10 +46,17 @@ export class GameLogic {
     this.space.db.add(gameState);
   }
 
-  checkWin({ player, gameState }: { player: Player; gameState: GameState }) {
+  checkWin({ player }: { player: Player }) {
     if (player.number >= 10) {
-      gameState.state = GameStateEnum.FINISHED;
+      this.activeGameState.state = GameStateEnum.FINISHED;
     }
+  }
+
+  resetPlayer(player: Player) {
+    // for each property in playerDefault, set to player
+    Object.keys(this.playerDefault).forEach((key) => {
+      player[key] = this.playerDefault[key];
+    });
   }
 
   async joinPlayer({
@@ -68,8 +83,8 @@ export class GameLogic {
         playerName,
         playerId,
         ready: false,
-        number: 0,
         totalWins: 0,
+        ...this.playerDefault,
       })
     );
   }

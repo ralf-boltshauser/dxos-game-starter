@@ -25,6 +25,8 @@
 - [x] make game state have id of space, if already exist, fail or smth
 - [x] code like gameState[0] will lead to bugs -> can be fixed with usequery, type, spaceId: ...
 - [ ] create a design for the whole app in figma
+- [ ] get activegamestate, etc in gamelogic
+- [ ] make new game and player join based on effect schema default and not a dict
 - [ ] a good readme
   - [ ] add index.css to app.tsx
 - [ ] loading states

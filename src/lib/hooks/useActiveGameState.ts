@@ -6,7 +6,7 @@ const useActiveGameState = (): GameState | null => {
   const { space } = useGameSpace();
   const gameStates = useQuery(space, {
     type: GameState.Type,
-    spaceId: space.id,
+    spaceId: space?.id as string,
   });
 
   if (gameStates.length === 1) {

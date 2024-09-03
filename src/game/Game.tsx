@@ -15,10 +15,10 @@ export const Game = () => {
 
   const activeGameState = useActiveGameState();
 
-  const gameLogic = new GameLogic(space);
+  const gameLogic = new GameLogic();
 
   if (activeGameState) {
-    gameLogic.checkWin({ player: myPlayer, gameState: activeGameState });
+    gameLogic.checkWin({ player: myPlayer });
   }
 
   return (

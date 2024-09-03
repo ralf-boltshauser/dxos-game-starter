@@ -4,10 +4,12 @@ import { GameStateEnum, Player } from "@/schema";
 import { Filter, Space } from "@dxos/client/echo";
 import { useQuery } from "@dxos/react-client/echo";
 import React from "react";
+import { GameLogic } from "./GameLogic";
 
 export default function Ranking({ space }: { space: Space }) {
   const players = useQuery(space, Filter.schema(Player));
   const activeGameState = useActiveGameState();
+  const gameLogic = new GameLogic();
 
   const restart = () => {
     // loop over racers, and set number to 0, for first place increment totalWins by 1
@@ -18,7 +20,7 @@ export default function Ranking({ space }: { space: Space }) {
       return acc;
     }, players[0]);
     players.map((p) => {
-      p.number = 0;
+      gameLogic.resetPlayer(p);
       if (p.playerId === winner.playerId) {
         p.totalWins += 1;
       }

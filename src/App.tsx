@@ -83,7 +83,7 @@ export const HomeContainer = () => {
       });
       void (async () => {
         const { space } = await shell.joinSpace({ invitationCode });
-        const gameLogic = new GameLogic(space);
+        const gameLogic = new GameLogic();
         if (space) {
           await gameLogic.joinPlayer({
             playerId: identity.identityKey.toString(),

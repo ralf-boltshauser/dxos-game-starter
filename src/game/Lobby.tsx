@@ -44,7 +44,7 @@ export default function Lobby({
 
   const myPlayer = useMyPlayer();
 
-  const gameLogic = new GameLogic(space);
+  const gameLogic = new GameLogic();
 
   useEffect(() => {
     let timer;
