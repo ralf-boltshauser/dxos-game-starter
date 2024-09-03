@@ -23,14 +23,15 @@ export default function Lobby() {
             <h3>{space.id.substring(0, 5)}...</h3>
             <Button
               onClick={() => {
-                // gameLogic.startGame({
-                //   hasHost: false,
-                //   creatorId: identity.identityKey.toString(),
-                // });
-                // gameLogic.joinPlayer({
-                //   playerId: identity.identityKey.toString(),
-                //   playerName: identity.profile?.displayName || "Player",
-                // });
+                gameLogic.space = space;
+                gameLogic.startGame({
+                  hasHost: false,
+                  creatorId: identity.identityKey.toString(),
+                });
+                gameLogic.joinPlayer({
+                  playerId: identity.identityKey.toString(),
+                  playerName: identity.profile?.displayName || "Player",
+                });
 
                 navigate(`/game/${space.id}`);
               }}
@@ -39,6 +40,7 @@ export default function Lobby() {
             </Button>
             <Button
               onClick={async () => {
+                gameLogic.space = space;
                 gameLogic.startGame({
                   hasHost: true,
                   creatorId: identity.identityKey.toString(),
@@ -56,6 +58,7 @@ export default function Lobby() {
         <div className="flex flex-row gap-4 items-center">
           <Button
             onClick={() => {
+              gameLogic.space = space;
               gameLogic.startGame({
                 hasHost: false,
                 creatorId: identity.identityKey.toString(),
@@ -86,7 +89,7 @@ export default function Lobby() {
             onClick={async () => {
               const { space } = await shell.joinSpace({});
 
-              const gameLogic = new GameLogic();
+              gameLogic.space = space;
 
               await gameLogic.joinPlayer({
                 playerId: identity.identityKey.toString(),

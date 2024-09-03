@@ -1,11 +1,15 @@
 import useActiveGameState from "@/lib/hooks/useActiveGameState";
 import useGameSpace from "@/lib/hooks/useGameSpace";
+import useMyPlayer from "@/lib/hooks/useMyPlayer";
 import { GameState, GameStateEnum, Player } from "@/schema";
-import { create, Space } from "@dxos/client/echo";
+import { create, Filter, Space } from "@dxos/client/echo";
+import { useQuery } from "@dxos/react-client/echo";
 
 export class GameLogic {
   space: Space;
   activeGameState: GameState;
+  players: Player[] = [];
+  myPlayer: Player;
   minPlayers = 1;
   playerDefault = {
     number: 0,
@@ -15,7 +19,10 @@ export class GameLogic {
     const { space } = useGameSpace();
     this.space = space;
     this.activeGameState = useActiveGameState();
+    this.players = useQuery(space, Filter.schema(Player));
+    this.myPlayer = useMyPlayer();
   }
+
   async startGame({
     hasHost,
     creatorId,
